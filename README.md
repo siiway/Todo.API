@@ -8,7 +8,7 @@ pinned: false
 app_port: 5000
 ---
 
-The table above contains the configuration for the Huggingface Space.  
+The table above contains the configuration for the Huggingface Space.
 Just ignore it.
 
 # Simple ToDo API
@@ -263,7 +263,7 @@ Invoke-RestMethod -Uri 'http://127.0.0.1:5000/api/todos/export' -Method Get -Hea
 
 ## Docker Support
 
-This project includes Docker support for easy deployment on various platforms.
+This project includes Docker support for easy deployment on various platforms. The Dockerfile uses Ubuntu 22.04 as the base image and clones the repository during the build process, ensuring a lightweight and up-to-date deployment.
 
 ### Building the Docker Image Locally
 

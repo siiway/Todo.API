@@ -1,13 +1,27 @@
-FROM python:3.11-slim
+FROM ubuntu:22.04
 
-# Install git
+# Set timezone and avoid interactive prompts
+ENV TZ=UTC \
+    DEBIAN_FRONTEND=noninteractive
+
+# Set timezone
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
+    echo $TZ > /etc/timezone
+
+# Install dependencies
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends git && \
+    apt-get install -y --no-install-recommends \
+        git \
+        python3 \
+        python3-pip \
+        tzdata \
+        curl \
+        ca-certificates && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # Set working directory
-WORKDIR /app
+WORKDIR /todo_api
 
 # Clone the repository
 RUN git clone --depth 1 https://github.com/siiway/Todo.API.git .
@@ -24,14 +38,14 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 # - DEBUG_MODE: Enable Flask debug mode (default: false)
 
 # Install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip3 install --no-cache-dir -r requirements.txt
 
-# Create data directory for persistence
-RUN mkdir -p /app/data && \
-    chmod 777 /app/data
+# Create data directory for persistence and set permissions
+RUN mkdir -p /todo_api/data && \
+    chmod -R 777 /todo_api
 
 # Expose port
 EXPOSE 5000
 
 # Command to run the application
-CMD ["python", "app.py"]
+CMD ["python3", "app.py"]
