@@ -62,7 +62,6 @@ class TodoResource(Resource):
         return {'message': 'Todo deleted successfully'}
 
 class PrivateModeResource(Resource):
-    @auth_required
     def get(self):
         return {'private_mode': models.private_mode}
 

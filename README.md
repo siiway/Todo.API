@@ -119,16 +119,20 @@ The application provides two interfaces:
 ```
 GET /api/todos
 ```
+Requires authentication in private mode.
 
 ### Get a specific todo
 ```
 GET /api/todos/<id>
 ```
+Requires authentication in private mode.
 
 ### Create a new todo
 ```
 POST /api/todos
 ```
+Requires authentication.
+
 Request body:
 ```json
 {
@@ -142,6 +146,8 @@ Request body:
 ```
 PUT /api/todos/<id>
 ```
+Requires authentication.
+
 Request body:
 ```json
 {
@@ -155,12 +161,13 @@ Request body:
 ```
 DELETE /api/todos/<id>
 ```
+Requires authentication.
 
 ### Get Private Mode status
 ```
 GET /api/private-mode
 ```
-Requires authentication.
+No authentication required.
 
 ### Toggle Private Mode
 ```
@@ -205,7 +212,7 @@ curl -X POST http://127.0.0.1:5000/api/todos -H "Content-Type: application/json"
 
 ### Checking Private Mode status
 ```
-curl -X GET http://127.0.0.1:5000/api/private-mode -H "Authorization: Bearer your_secret_token"
+curl -X GET http://127.0.0.1:5000/api/private-mode
 ```
 
 ### Enabling Private Mode
@@ -225,6 +232,9 @@ Invoke-RestMethod -Uri 'http://127.0.0.1:5000/api/todos' -Method Get
 
 # Get todos (with Authentication)
 Invoke-RestMethod -Uri 'http://127.0.0.1:5000/api/todos' -Method Get -Headers @{Authorization = "Bearer your_secret_token"}
+
+# Check Private Mode status (no authentication required)
+Invoke-RestMethod -Uri 'http://127.0.0.1:5000/api/private-mode' -Method Get
 
 # Create a todo
 $body = @{ title = 'New Task' } | ConvertTo-Json
