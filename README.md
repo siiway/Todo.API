@@ -4,6 +4,7 @@ emoji: 📝
 colorFrom: blue
 colorTo: green
 sdk: docker
+license: gpl-3.0
 pinned: false
 app_port: 5000
 ---
@@ -300,30 +301,6 @@ docker run -p 5000:5000 \
   -v $(pwd)/data:/app/data \
   todo-api
 ```
-
-### Deploying on Hugging Face Spaces
-
-This project is configured for easy deployment on Hugging Face Spaces:
-
-1. Fork or clone this repository to your GitHub account
-2. Create a new Space on Hugging Face and select "From GitHub repo"
-3. Enter your repository URL
-4. The Space configuration at the top of this README will be automatically detected
-5. Set the required environment variables in the Space settings:
-   - `TODO_TOKEN`: Your authentication token (required)
-   - `PAGE_TITLE`: Custom title for the application (optional)
-   - `SHOW_ADMIN_PANEL_BUTTON`: Whether to show admin panel button (optional)
-   - `DEBUG_MODE`: Enable Flask debug mode (optional)
-6. For persistent data, Hugging Face Spaces provides persistent storage by default
-
-### Deploying on Other Platforms (Render, Heroku, etc.)
-
-When deploying on other platforms:
-
-1. Point the platform to the GitHub repository: `https://github.com/siiway/Todo.API.git`
-2. Set the required environment variables in the platform's configuration interface
-3. Configure the platform to expose port 5000 (if required)
-4. For persistent data, configure a persistent storage volume mounted at `/app/data` (if supported by the platform)
 
 ## Open Source
 
