@@ -1,0 +1,218 @@
+# Simple ToDo API
+
+A simple RESTful API for managing todo items built with Python and Flask.
+
+## Setup
+
+1. Create a virtual environment:
+   ```
+   python -m venv venv
+   ```
+
+2. Activate the virtual environment:
+   - Windows: `venv\Scripts\activate`
+   - Unix/MacOS: `source venv/bin/activate`
+
+3. Install dependencies:
+   ```
+   pip install -r requirements.txt
+   ```
+
+4. Set the environment variables:
+   - Required:
+     - Windows: `set TODO_TOKEN=your_secret_token`
+     - Unix/MacOS: `export TODO_TOKEN=your_secret_token`
+
+   - Optional:
+     - Windows:
+       ```
+       set PAGE_TITLE=Your Custom Title
+       set SHOW_ADMIN_PANEL_BUTTON=true
+       set DEBUG_MODE=false
+       ```
+     - Unix/MacOS:
+       ```
+       export PAGE_TITLE="Your Custom Title"
+       export SHOW_ADMIN_PANEL_BUTTON=true
+       export DEBUG_MODE=false
+       ```
+
+5. Run the application:
+   ```
+   python app.py
+   ```
+
+The API will be available at `http://127.0.0.1:5000`.
+
+## Environment Variables
+
+The application supports the following environment variables:
+
+| Variable | Description | Default Value | Required |
+|----------|-------------|---------------|----------|
+| `TODO_TOKEN` | Authentication token for API access | None | Yes |
+| `PAGE_TITLE` | Custom title for the application | "ToDo App" | No |
+| `SHOW_ADMIN_PANEL_BUTTON` | Whether to show the admin panel button on the home page | "true" | No |
+| `DEBUG_MODE` | Enable Flask debug mode with auto-reloading and detailed error pages | "false" | No |
+
+Note: For boolean environment variables like `SHOW_ADMIN_PANEL_BUTTON`, the values "true", "yes", "1", "y" (case-insensitive) are considered true. Any other value is considered false.
+
+## Authentication
+
+The API uses two levels of authentication:
+
+1. **Guest Access (Default Mode)**:
+   - Guests can read todos (GET operations) without authentication
+   - All write operations (POST, PUT, DELETE) require authentication
+
+2. **Private Mode**:
+   - When enabled, all operations (including GET) require authentication
+   - This mode can be toggled by authenticated users
+
+Authentication is done using a Bearer token in the Authorization header:
+
+```
+Authorization: Bearer your_secret_token
+```
+
+The token must match the value set in the `TODO_TOKEN` environment variable.
+
+## Data Persistence
+
+The application stores all data in JSON files located in the `data` directory:
+
+- `todos.json`: Contains all todo items and the next ID counter
+- `settings.json`: Contains application settings like private mode status
+
+Data is automatically saved to these files whenever:
+- A new todo is created
+- A todo is updated
+- A todo is deleted
+- Private mode is toggled
+
+This ensures that your data persists between application restarts.
+
+## Web Interface
+
+The application provides two interfaces:
+
+### Public View (`/`)
+- View all todos (read-only)
+- Link to admin panel
+
+### Admin Panel (`/admin/`)
+- Requires authentication with a valid token
+- Add new todos
+- Mark todos as completed
+- Delete todos
+- Toggle Private Mode
+
+## API Endpoints
+
+### Get all todos
+```
+GET /api/todos
+```
+
+### Get a specific todo
+```
+GET /api/todos/<id>
+```
+
+### Create a new todo
+```
+POST /api/todos
+```
+Request body:
+```json
+{
+  "title": "Task title",
+  "description": "Task description",
+  "completed": false
+}
+```
+
+### Update a todo
+```
+PUT /api/todos/<id>
+```
+Request body:
+```json
+{
+  "title": "Updated title",
+  "description": "Updated description",
+  "completed": true
+}
+```
+
+### Delete a todo
+```
+DELETE /api/todos/<id>
+```
+
+### Get Private Mode status
+```
+GET /api/private-mode
+```
+Requires authentication.
+
+### Toggle Private Mode
+```
+POST /api/private-mode
+```
+Requires authentication.
+
+Request body:
+```json
+{
+  "enabled": true
+}
+```
+
+## Example API Calls
+
+### Reading todos (Guest Access)
+```
+curl -X GET http://127.0.0.1:5000/api/todos
+```
+
+### Reading todos (with Authentication)
+```
+curl -X GET http://127.0.0.1:5000/api/todos -H "Authorization: Bearer your_secret_token"
+```
+
+### Creating a todo (Always requires authentication)
+```
+curl -X POST http://127.0.0.1:5000/api/todos -H "Content-Type: application/json" -H "Authorization: Bearer your_secret_token" -d '{"title": "New Task"}'
+```
+
+### Checking Private Mode status
+```
+curl -X GET http://127.0.0.1:5000/api/private-mode -H "Authorization: Bearer your_secret_token"
+```
+
+### Enabling Private Mode
+```
+curl -X POST http://127.0.0.1:5000/api/private-mode -H "Content-Type: application/json" -H "Authorization: Bearer your_secret_token" -d '{"enabled": true}'
+```
+
+### Using PowerShell
+```
+# Get todos (Guest Access)
+Invoke-RestMethod -Uri 'http://127.0.0.1:5000/api/todos' -Method Get
+
+# Get todos (with Authentication)
+Invoke-RestMethod -Uri 'http://127.0.0.1:5000/api/todos' -Method Get -Headers @{Authorization = "Bearer your_secret_token"}
+
+# Create a todo
+$body = @{ title = 'New Task' } | ConvertTo-Json
+Invoke-RestMethod -Uri 'http://127.0.0.1:5000/api/todos' -Method Post -Body $body -ContentType 'application/json' -Headers @{Authorization = "Bearer your_secret_token"}
+
+# Enable Private Mode
+$body = @{ enabled = $true } | ConvertTo-Json
+Invoke-RestMethod -Uri 'http://127.0.0.1:5000/api/private-mode' -Method Post -Body $body -ContentType 'application/json' -Headers @{Authorization = "Bearer your_secret_token"}
+```
+
+## Open Source
+
+This project is open source and available under the [GNU GPLv3 License](LICENSE). Feel free to contribute and improve it!

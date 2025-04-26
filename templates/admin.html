@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page_title }} - Admin Panel</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>{{ page_title }} - Admin Panel</h1>
+
+        <!-- Authentication Section -->
+        <div class="auth-section" id="auth-section">
+            <h2>Authentication</h2>
+            <div class="form-group">
+                <label for="token">API Token</label>
+                <input type="text" id="token" placeholder="Enter your API token">
+                <button id="save-token">Authenticate</button>
+            </div>
+            <p>
+                <small>
+                    <strong>Note:</strong> You need to provide a valid token to access the admin features.
+                </small>
+            </p>
+        </div>
+
+        <!-- Admin Content (hidden until authenticated) -->
+        <div id="admin-content" class="hidden">
+            <!-- Admin Header with Logout -->
+            <div class="admin-header">
+                <h2>Admin Panel</h2>
+                <div class="admin-actions">
+                    <span class="user-info">Logged in with token</span>
+                    <button id="logout-btn" class="logout-btn">Log Out</button>
+                </div>
+            </div>
+
+            <!-- Todo Form -->
+            <div class="form-container">
+                <h2>Add New Todo</h2>
+                <form id="todo-form">
+                    <div class="form-group">
+                        <label for="title">Title</label>
+                        <input type="text" id="title" placeholder="Enter todo title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea id="description" placeholder="Enter todo description"></textarea>
+                    </div>
+                    <button type="submit">Add Todo</button>
+                </form>
+            </div>
+
+            <!-- Private Mode Toggle -->
+            <div class="settings-section">
+                <h2>Settings</h2>
+                <div class="private-mode-toggle">
+                    <div class="toggle-control">
+                        <input type="checkbox" id="private-mode">
+                        <label for="private-mode" class="tooltip" data-tooltip="When enabled, all operations (including viewing) require authentication.">
+                            Enable Private Mode
+                        </label>
+                    </div>
+                </div>
+
+                <div class="theme-toggle">
+                    <div class="toggle-control">
+                        <input type="checkbox" id="dark-mode">
+                        <label for="dark-mode" class="tooltip" data-tooltip="Switch between light and dark color themes.">
+                            Enable Dark Mode
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Todo List -->
+            <div class="todo-management">
+                <h2>Manage Todos</h2>
+                <div class="todo-list" id="todo-list">
+                    <!-- Todos will be inserted here by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Back to View -->
+        <div class="back-link">
+            <p>
+                <a href="/" class="view-button">Back to Todo List</a>
+            </p>
+        </div>
+
+        <!-- Status Message -->
+        <div id="status-message" class="status-message hidden"></div>
+    </div>
+
+    <script src="/static/admin.js"></script>
+</body>
+</html>
