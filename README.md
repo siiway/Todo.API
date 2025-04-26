@@ -9,8 +9,7 @@ pinned: false
 app_port: 5000
 ---
 
-The table above contains the configuration for the Huggingface Space.
-Just ignore it.
+*The table above contains the configuration for the Huggingface Space. Just ignore it.*
 
 # Simple ToDo API
 
@@ -42,11 +41,15 @@ A simple RESTful API for managing todo items built with Python and Flask.
        ```
        set PAGE_TITLE=Your Custom Title
        set SHOW_ADMIN_PANEL_BUTTON=true
+       set SERVER_HOST=0.0.0.0
+       set SERVER_PORT=5000
        set DEBUG_MODE=false
        ```
      - Unix/MacOS:
        ```
        export PAGE_TITLE="Your Custom Title"
+       export SERVER_HOST="0.0.0.0"
+       export SERVER_PORT=5000
        export SHOW_ADMIN_PANEL_BUTTON=true
        export DEBUG_MODE=false
        ```
@@ -62,12 +65,12 @@ The API will be available at `http://127.0.0.1:5000`.
 
 The application supports the following environment variables:
 
-| Variable | Description | Default Value | Required |
-|----------|-------------|---------------|----------|
-| `TODO_TOKEN` | Authentication token for API access | None | Yes |
-| `PAGE_TITLE` | Custom title for the application | "ToDo App" | No |
-| `SHOW_ADMIN_PANEL_BUTTON` | Whether to show the admin panel button on the home page | "true" | No |
-| `DEBUG_MODE` | Enable Flask debug mode with auto-reloading and detailed error pages | "false" | No |
+| Variable                  | Description                                                          | Default Value | Required |
+| ------------------------- | -------------------------------------------------------------------- | ------------- | -------- |
+| `TODO_TOKEN`              | Authentication token for API access                                  | None          | Yes      |
+| `PAGE_TITLE`              | Custom title for the application                                     | "ToDo App"    | No       |
+| `SHOW_ADMIN_PANEL_BUTTON` | Whether to show the admin panel button on the home page              | "true"        | No       |
+| `DEBUG_MODE`              | Enable Flask debug mode with auto-reloading and detailed error pages | "false"       | No       |
 
 Note: For boolean environment variables like `SHOW_ADMIN_PANEL_BUTTON`, the values "true", "yes", "1", "y" (case-insensitive) are considered true. Any other value is considered false.
 
