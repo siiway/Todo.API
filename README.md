@@ -8,6 +8,9 @@ pinned: false
 app_port: 5000
 ---
 
+The table above contains the configuration for the Huggingface Space.  
+Just ignore it.
+
 # Simple ToDo API
 
 A simple RESTful API for managing todo items built with Python and Flask.
