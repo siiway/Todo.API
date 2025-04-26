@@ -1,3 +1,13 @@
+---
+title: ToDo API
+emoji: 📝
+colorFrom: blue
+colorTo: green
+sdk: docker
+pinned: false
+app_port: 5000
+---
+
 # Simple ToDo API
 
 A simple RESTful API for managing todo items built with Python and Flask.
@@ -247,6 +257,70 @@ Invoke-RestMethod -Uri 'http://127.0.0.1:5000/api/private-mode' -Method Post -Bo
 # Export Todos as JSON
 Invoke-RestMethod -Uri 'http://127.0.0.1:5000/api/todos/export' -Method Get -Headers @{Authorization = "Bearer your_secret_token"} -OutFile 'todos_export.json'
 ```
+
+## Docker Support
+
+This project includes Docker support for easy deployment on various platforms.
+
+### Building the Docker Image Locally
+
+```bash
+docker build -t todo-api .
+```
+
+### Running the Container Locally
+
+```bash
+docker run -p 5000:5000 -e TODO_TOKEN=your_secret_token todo-api
+```
+
+### Using Environment Variables
+
+You can pass environment variables to customize the application:
+
+```bash
+docker run -p 5000:5000 \
+  -e TODO_TOKEN=your_secret_token \
+  -e PAGE_TITLE="My Custom ToDo App" \
+  -e SHOW_ADMIN_PANEL_BUTTON=true \
+  -e DEBUG_MODE=false \
+  todo-api
+```
+
+### Persisting Data
+
+To persist data between container restarts, mount a volume to the `/app/data` directory:
+
+```bash
+docker run -p 5000:5000 \
+  -e TODO_TOKEN=your_secret_token \
+  -v $(pwd)/data:/app/data \
+  todo-api
+```
+
+### Deploying on Hugging Face Spaces
+
+This project is configured for easy deployment on Hugging Face Spaces:
+
+1. Fork or clone this repository to your GitHub account
+2. Create a new Space on Hugging Face and select "From GitHub repo"
+3. Enter your repository URL
+4. The Space configuration at the top of this README will be automatically detected
+5. Set the required environment variables in the Space settings:
+   - `TODO_TOKEN`: Your authentication token (required)
+   - `PAGE_TITLE`: Custom title for the application (optional)
+   - `SHOW_ADMIN_PANEL_BUTTON`: Whether to show admin panel button (optional)
+   - `DEBUG_MODE`: Enable Flask debug mode (optional)
+6. For persistent data, Hugging Face Spaces provides persistent storage by default
+
+### Deploying on Other Platforms (Render, Heroku, etc.)
+
+When deploying on other platforms:
+
+1. Point the platform to the GitHub repository: `https://github.com/siiway/Todo.API.git`
+2. Set the required environment variables in the platform's configuration interface
+3. Configure the platform to expose port 5000 (if required)
+4. For persistent data, configure a persistent storage volume mounted at `/app/data` (if supported by the platform)
 
 ## Open Source
 
