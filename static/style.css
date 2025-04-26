@@ -289,11 +289,35 @@ button:hover {
 .todo-actions {
     display: flex;
     gap: 5px;
+    margin-bottom: 15px;
 }
 
 .todo-actions button {
     padding: 5px 10px;
     font-size: 14px;
+}
+
+.export-btn {
+    background-color: var(--button-bg);
+    color: var(--button-color);
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+    display: inline-flex;
+    align-items: center;
+}
+
+.export-btn:hover {
+    background-color: var(--button-hover);
+}
+
+.export-btn::before {
+    content: "↓";
+    margin-right: 5px;
+    font-weight: bold;
 }
 
 .delete-btn {

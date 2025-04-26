@@ -92,6 +92,11 @@ Data is automatically saved to these files whenever:
 
 This ensures that your data persists between application restarts.
 
+The application also includes an automatic file repair mechanism that:
+- Detects corrupted or empty JSON files on startup
+- Creates new valid files with default values if needed
+- Ensures the application can start even if data files are damaged
+
 ## Web Interface
 
 The application provides two interfaces:
@@ -106,6 +111,7 @@ The application provides two interfaces:
 - Mark todos as completed
 - Delete todos
 - Toggle Private Mode
+- Export todos as JSON file
 
 ## API Endpoints
 
@@ -169,6 +175,17 @@ Request body:
 }
 ```
 
+### Export Todos as JSON
+```
+GET /api/todos/export
+```
+Requires authentication.
+
+Returns a downloadable JSON file containing all todos with additional metadata. The response includes:
+- Content-Disposition header for browser download
+- Content-Type: application/json
+- A JSON object with todos, next_id, exported_at timestamp, and count fields
+
 ## Example API Calls
 
 ### Reading todos (Guest Access)
@@ -196,6 +213,11 @@ curl -X GET http://127.0.0.1:5000/api/private-mode -H "Authorization: Bearer you
 curl -X POST http://127.0.0.1:5000/api/private-mode -H "Content-Type: application/json" -H "Authorization: Bearer your_secret_token" -d '{"enabled": true}'
 ```
 
+### Exporting Todos as JSON
+```
+curl -X GET http://127.0.0.1:5000/api/todos/export -H "Authorization: Bearer your_secret_token" -o todos_export.json
+```
+
 ### Using PowerShell
 ```
 # Get todos (Guest Access)
@@ -211,6 +233,9 @@ Invoke-RestMethod -Uri 'http://127.0.0.1:5000/api/todos' -Method Post -Body $bod
 # Enable Private Mode
 $body = @{ enabled = $true } | ConvertTo-Json
 Invoke-RestMethod -Uri 'http://127.0.0.1:5000/api/private-mode' -Method Post -Body $body -ContentType 'application/json' -Headers @{Authorization = "Bearer your_secret_token"}
+
+# Export Todos as JSON
+Invoke-RestMethod -Uri 'http://127.0.0.1:5000/api/todos/export' -Method Get -Headers @{Authorization = "Bearer your_secret_token"} -OutFile 'todos_export.json'
 ```
 
 ## Open Source

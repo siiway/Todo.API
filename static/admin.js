@@ -14,6 +14,7 @@ const descriptionInput = document.getElementById('description');
 const tokenInput = document.getElementById('token');
 const saveTokenBtn = document.getElementById('save-token');
 const logoutBtn = document.getElementById('logout-btn');
+const exportTodosBtn = document.getElementById('export-todos');
 const privateModeToggle = document.getElementById('private-mode');
 const darkModeToggle = document.getElementById('dark-mode');
 const statusMessage = document.getElementById('status-message');
@@ -53,6 +54,10 @@ privateModeToggle.addEventListener('change', () => {
 
 darkModeToggle.addEventListener('change', () => {
     toggleDarkMode();
+});
+
+exportTodosBtn.addEventListener('click', () => {
+    exportTodos();
 });
 
 // Authentication Functions
@@ -333,4 +338,57 @@ function escapeHtml(unsafe) {
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
+}
+
+async function exportTodos() {
+    if (!isAuthenticated) {
+        showMessage('You must be authenticated to export todos', 'error');
+        return;
+    }
+
+    try {
+        showMessage('Preparing export...', 'success');
+
+        // Call the export API endpoint
+        const response = await fetch('/api/todos/export', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        // Get the filename from the Content-Disposition header if available
+        let filename = 'todos_export.json';
+        const contentDisposition = response.headers.get('Content-Disposition');
+        if (contentDisposition) {
+            const filenameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
+            if (filenameMatch && filenameMatch[1]) {
+                filename = filenameMatch[1];
+            }
+        }
+
+        // Convert the response to a blob
+        const blob = await response.blob();
+
+        // Create a download link and trigger the download
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+
+        // Clean up
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+
+        showMessage('Export successful', 'success');
+    } catch (error) {
+        console.error('Error exporting todos:', error);
+        showMessage('Failed to export todos', 'error');
+    }
 }

@@ -26,47 +26,93 @@ def load_todos():
     abs_path = os.path.abspath(TODOS_FILE)
     print(f"Attempting to load todos from: {abs_path}")
 
-    # Check if file exists with case-insensitive search
+    # Ensure data directory exists
+    if not os.path.exists(DATA_DIR):
+        os.makedirs(DATA_DIR)
+        print(f"Created data directory: {DATA_DIR}")
+
+    # Check if file exists
     data_dir_files = os.listdir(DATA_DIR) if os.path.exists(DATA_DIR) else []
     print(f"Files in data directory: {data_dir_files}")
+
+    # Initialize with empty data
+    todos = {}
+    next_id = 1
 
     if os.path.exists(TODOS_FILE):
         print(f"File exists check passed for: {TODOS_FILE}")
         try:
+            # Check if file is empty
+            if os.path.getsize(TODOS_FILE) == 0:
+                print(f"File {TODOS_FILE} is empty, initializing with empty data")
+                # Create a new empty file with valid JSON structure
+                create_empty_todos_file()
+                return
+
+            # Try to load the file
             with open(TODOS_FILE, 'r') as f:
                 print(f"Successfully opened file for reading")
-                data = json.load(f)
-                todos_data = data.get('todos', {})
-                next_id = data.get('next_id', 1)
+                try:
+                    data = json.load(f)
+                    todos_data = data.get('todos', {})
+                    next_id = data.get('next_id', 1)
 
-                print(f"Loaded JSON data: {len(todos_data)} todos, next_id={next_id}")
+                    print(f"Loaded JSON data: {len(todos_data)} todos, next_id={next_id}")
 
-                # Convert string keys to integers
-                todos = {}
-                for id_str, todo_data in todos_data.items():
-                    todo_id = int(id_str)
-                    todo = Todo(
-                        title=todo_data['title'],
-                        description=todo_data['description'],
-                        completed=todo_data['completed'],
-                        id=todo_id  # Pass the ID directly to avoid auto-increment
-                    )
-                    # Set timestamps from the saved data
-                    todo.created_at = datetime.fromisoformat(todo_data['created_at'])
-                    todo.updated_at = datetime.fromisoformat(todo_data['updated_at'])
-                    todos[todo_id] = todo
-                    print(f"Loaded todo #{todo_id}: {todo.title}")
+                    # Convert string keys to integers
+                    todos = {}
+                    for id_str, todo_data in todos_data.items():
+                        todo_id = int(id_str)
+                        todo = Todo(
+                            title=todo_data['title'],
+                            description=todo_data['description'],
+                            completed=todo_data['completed'],
+                            id=todo_id  # Pass the ID directly to avoid auto-increment
+                        )
+                        # Set timestamps from the saved data
+                        todo.created_at = datetime.fromisoformat(todo_data['created_at'])
+                        todo.updated_at = datetime.fromisoformat(todo_data['updated_at'])
+                        todos[todo_id] = todo
+                        print(f"Loaded todo #{todo_id}: {todo.title}")
 
-                print(f"Loaded {len(todos)} todos from {TODOS_FILE}")
+                    print(f"Loaded {len(todos)} todos from {TODOS_FILE}")
+                except json.JSONDecodeError as e:
+                    print(f"JSON decode error in {TODOS_FILE}: {e}")
+                    print("File is corrupted, creating a new empty file")
+                    create_empty_todos_file()
         except Exception as e:
             print(f"Error loading todos: {e}")
             import traceback
             traceback.print_exc()
-            # Initialize with empty data if loading fails
-            todos = {}
-            next_id = 1
+            # Create a new empty file with valid JSON structure
+            create_empty_todos_file()
     else:
-        print(f"Todos file not found at {TODOS_FILE}, starting with empty data")
+        print(f"Todos file not found at {TODOS_FILE}, creating a new empty file")
+        create_empty_todos_file()
+
+def create_empty_todos_file():
+    """Create a new empty todos file with valid JSON structure"""
+    global todos, next_id
+
+    # Initialize with empty data
+    todos = {}
+    next_id = 1
+
+    # Create the empty file
+    try:
+        data = {
+            'todos': {},
+            'next_id': 1
+        }
+
+        with open(TODOS_FILE, 'w') as f:
+            json.dump(data, f, indent=2)
+
+        print(f"Created new empty todos file at {TODOS_FILE}")
+    except Exception as e:
+        print(f"Error creating empty todos file: {e}")
+        import traceback
+        traceback.print_exc()
 
 def save_todos():
     """Save todos to file"""
@@ -104,16 +150,55 @@ def save_todos():
 def load_settings():
     """Load settings from file"""
     global private_mode
+
+    # Initialize with default settings
+    private_mode = False
+
     if os.path.exists(SETTINGS_FILE):
         try:
+            # Check if file is empty
+            if os.path.getsize(SETTINGS_FILE) == 0:
+                print(f"File {SETTINGS_FILE} is empty, initializing with default settings")
+                create_empty_settings_file()
+                return
+
             with open(SETTINGS_FILE, 'r') as f:
-                settings = json.load(f)
-                private_mode = settings.get('private_mode', False)
-                print(f"Loaded settings from {SETTINGS_FILE}")
+                try:
+                    settings = json.load(f)
+                    private_mode = settings.get('private_mode', False)
+                    print(f"Loaded settings from {SETTINGS_FILE}")
+                except json.JSONDecodeError as e:
+                    print(f"JSON decode error in {SETTINGS_FILE}: {e}")
+                    print("Settings file is corrupted, creating a new one with defaults")
+                    create_empty_settings_file()
         except Exception as e:
             print(f"Error loading settings: {e}")
+            create_empty_settings_file()
     else:
-        print(f"Settings file not found at {SETTINGS_FILE}, using defaults")
+        print(f"Settings file not found at {SETTINGS_FILE}, creating with defaults")
+        create_empty_settings_file()
+
+def create_empty_settings_file():
+    """Create a new settings file with default values"""
+    global private_mode
+
+    # Initialize with default settings
+    private_mode = False
+
+    # Create the settings file
+    try:
+        settings = {
+            'private_mode': False
+        }
+
+        with open(SETTINGS_FILE, 'w') as f:
+            json.dump(settings, f, indent=2)
+
+        print(f"Created new settings file at {SETTINGS_FILE}")
+    except Exception as e:
+        print(f"Error creating settings file: {e}")
+        import traceback
+        traceback.print_exc()
 
 def save_settings():
     """Save settings to file"""
