@@ -78,7 +78,9 @@
             <div class="todo-management">
                 <h2>Manage Todos</h2>
                 <div class="todo-actions">
-                    <button id="export-todos" class="export-btn">Export Todos as JSON</button>
+                    <button id="export-todos" class="action-btn">Export Todos as JSON</button>
+                    <button id="import-todos" class="action-btn">Import Todos from JSON</button>
+                    <input type="file" id="import-file" accept=".json" class="hidden-file-input" />
                 </div>
                 <div class="todo-list" id="todo-list">
                     <!-- Todos will be inserted here by JavaScript -->

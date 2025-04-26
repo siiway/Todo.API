@@ -15,6 +15,8 @@ const tokenInput = document.getElementById('token');
 const saveTokenBtn = document.getElementById('save-token');
 const logoutBtn = document.getElementById('logout-btn');
 const exportTodosBtn = document.getElementById('export-todos');
+const importTodosBtn = document.getElementById('import-todos');
+const importFileInput = document.getElementById('import-file');
 const privateModeToggle = document.getElementById('private-mode');
 const darkModeToggle = document.getElementById('dark-mode');
 const statusMessage = document.getElementById('status-message');
@@ -58,6 +60,18 @@ darkModeToggle.addEventListener('change', () => {
 
 exportTodosBtn.addEventListener('click', () => {
     exportTodos();
+});
+
+importTodosBtn.addEventListener('click', () => {
+    // Trigger file input click when import button is clicked
+    importFileInput.click();
+});
+
+// Add event listener for file selection
+importFileInput.addEventListener('change', () => {
+    if (importFileInput.files.length > 0) {
+        importTodos();
+    }
 });
 
 // Authentication Functions
@@ -391,4 +405,92 @@ async function exportTodos() {
         console.error('Error exporting todos:', error);
         showMessage('Failed to export todos', 'error');
     }
+}
+
+async function importTodos() {
+    if (!isAuthenticated) {
+        showMessage('You must be authenticated to import todos', 'error');
+        return;
+    }
+
+    // Check if a file is selected
+    if (!importFileInput.files || importFileInput.files.length === 0) {
+        showMessage('Please select a JSON file to import', 'error');
+        return;
+    }
+
+    const file = importFileInput.files[0];
+
+    // Check if the file is a JSON file
+    if (!file.name.endsWith('.json') && file.type !== 'application/json') {
+        showMessage('Please select a valid JSON file', 'error');
+        return;
+    }
+
+    try {
+        showMessage('Reading file...', 'success');
+
+        // Read the file
+        const fileContent = await readFileAsText(file);
+
+        // Parse the JSON
+        let jsonData;
+        try {
+            jsonData = JSON.parse(fileContent);
+        } catch (e) {
+            showMessage('Invalid JSON format', 'error');
+            return;
+        }
+
+        // Validate the JSON structure
+        if (!jsonData.todos || !jsonData.next_id) {
+            showMessage('Invalid JSON format: missing required fields', 'error');
+            return;
+        }
+
+        // Confirm import
+        if (!confirm('This will replace all existing todos. Are you sure you want to continue?')) {
+            showMessage('Import cancelled', 'error');
+            return;
+        }
+
+        showMessage('Importing todos...', 'success');
+
+        // Call the import API endpoint
+        const response = await fetch('/api/todos/import', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: fileContent
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        showMessage(`Import successful: ${result.imported_count} todos imported`, 'success');
+
+        // Reload todos
+        loadTodos();
+
+        // Clear the file input
+        importFileInput.value = '';
+    } catch (error) {
+        console.error('Error importing todos:', error);
+        showMessage(`Failed to import todos: ${error.message}`, 'error');
+    }
+}
+
+// Helper function to read a file as text
+function readFileAsText(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = event => resolve(event.target.result);
+        reader.onerror = error => reject(error);
+        reader.readAsText(file);
+    });
 }

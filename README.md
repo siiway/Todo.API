@@ -207,6 +207,43 @@ Returns a downloadable JSON file containing all todos with additional metadata. 
 - Content-Type: application/json
 - A JSON object with todos, next_id, exported_at timestamp, and count fields
 
+### Import Todos from JSON
+```
+POST /api/todos/import
+```
+Requires authentication.
+
+Imports todos from a JSON file previously exported using the export endpoint. This will replace all existing todos.
+
+Request body:
+```json
+{
+  "todos": {
+    "1": {
+      "id": 1,
+      "title": "Task title",
+      "description": "Task description",
+      "completed": false,
+      "created_at": "2023-01-01T12:00:00",
+      "updated_at": "2023-01-01T12:00:00"
+    },
+    "2": { ... }
+  },
+  "next_id": 3,
+  "exported_at": "2023-01-01T12:00:00",
+  "count": 2
+}
+```
+
+Response:
+```json
+{
+  "message": "Todos imported successfully",
+  "imported_count": 2,
+  "previous_count": 0
+}
+```
+
 ## Example API Calls
 
 ### Reading todos (Guest Access)
@@ -239,6 +276,11 @@ curl -X POST http://127.0.0.1:5000/api/private-mode -H "Content-Type: applicatio
 curl -X GET http://127.0.0.1:5000/api/todos/export -H "Authorization: Bearer your_secret_token" -o todos_export.json
 ```
 
+### Importing Todos from JSON
+```
+curl -X POST http://127.0.0.1:5000/api/todos/import -H "Content-Type: application/json" -H "Authorization: Bearer your_secret_token" -d @todos_export.json
+```
+
 ### Using PowerShell
 ```
 # Get todos (Guest Access)
@@ -260,6 +302,10 @@ Invoke-RestMethod -Uri 'http://127.0.0.1:5000/api/private-mode' -Method Post -Bo
 
 # Export Todos as JSON
 Invoke-RestMethod -Uri 'http://127.0.0.1:5000/api/todos/export' -Method Get -Headers @{Authorization = "Bearer your_secret_token"} -OutFile 'todos_export.json'
+
+# Import Todos from JSON
+$importData = Get-Content -Path 'todos_export.json' -Raw
+Invoke-RestMethod -Uri 'http://127.0.0.1:5000/api/todos/import' -Method Post -Body $importData -ContentType 'application/json' -Headers @{Authorization = "Bearer your_secret_token"}
 ```
 
 ## Docker Support

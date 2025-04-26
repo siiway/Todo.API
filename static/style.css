@@ -297,7 +297,7 @@ button:hover {
     font-size: 14px;
 }
 
-.export-btn {
+.action-btn {
     background-color: var(--button-bg);
     color: var(--button-color);
     border: none;
@@ -308,16 +308,28 @@ button:hover {
     transition: background-color 0.3s;
     display: inline-flex;
     align-items: center;
+    margin-right: 10px;
+    margin-bottom: 10px;
 }
 
-.export-btn:hover {
+.action-btn:hover {
     background-color: var(--button-hover);
 }
 
-.export-btn::before {
+#export-todos::before {
     content: "↓";
     margin-right: 5px;
     font-weight: bold;
+}
+
+#import-todos::before {
+    content: "↑";
+    margin-right: 5px;
+    font-weight: bold;
+}
+
+.hidden-file-input {
+    display: none;
 }
 
 .delete-btn {

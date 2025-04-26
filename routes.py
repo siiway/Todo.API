@@ -101,8 +101,69 @@ class TodoExportResource(Resource):
         except Exception as e:
             return {'message': f'Error exporting todos: {str(e)}'}, 500
 
+class TodoImportResource(Resource):
+    @auth_required
+    def post(self):
+        """Import todos from a JSON file"""
+        try:
+            # Check if the request contains JSON data
+            if not request.is_json:
+                return {'message': 'Request must contain JSON data'}, 400
+
+            data = request.get_json()
+
+            # Validate the JSON structure
+            if 'todos' not in data:
+                return {'message': 'Invalid JSON format: missing "todos" field'}, 400
+
+            if 'next_id' not in data:
+                return {'message': 'Invalid JSON format: missing "next_id" field'}, 400
+
+            # Get the current todos count for reporting
+            old_count = len(todos)
+
+            # Clear existing todos
+            todos.clear()
+
+            # Import todos from the JSON data
+            for id_str, todo_data in data['todos'].items():
+                todo_id = int(id_str)
+
+                # Create a new Todo object
+                todo = models.Todo(
+                    title=todo_data['title'],
+                    description=todo_data.get('description', ''),
+                    completed=todo_data.get('completed', False),
+                    id=todo_id
+                )
+
+                # Set timestamps if available
+                if 'created_at' in todo_data:
+                    todo.created_at = datetime.fromisoformat(todo_data['created_at'])
+                if 'updated_at' in todo_data:
+                    todo.updated_at = datetime.fromisoformat(todo_data['updated_at'])
+
+                # Add the todo to the collection
+                todos[todo_id] = todo
+
+            # Update the next_id counter
+            models.next_id = data['next_id']
+
+            # Save the imported todos to file
+            models.save_todos()
+
+            # Return success message
+            return {
+                'message': 'Todos imported successfully',
+                'imported_count': len(todos),
+                'previous_count': old_count
+            }
+        except Exception as e:
+            return {'message': f'Error importing todos: {str(e)}'}, 500
+
 def initialize_routes(api):
     api.add_resource(TodoListResource, '/api/todos')
     api.add_resource(TodoResource, '/api/todos/<todo_id>')
     api.add_resource(PrivateModeResource, '/api/private-mode')
     api.add_resource(TodoExportResource, '/api/todos/export')
+    api.add_resource(TodoImportResource, '/api/todos/import')
